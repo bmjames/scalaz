@@ -38,6 +38,10 @@ trait Foldable[F[_]]  { self =>
     foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(dualMonoid) apply (z)
   }
 
+  /** Variant of `foldMap`, substituting the zero value of type `B` where the partial function is undefined */
+  def foldCollect[A, B](fa: F[A])(pfn: PartialFunction[A, B])(implicit F: Monoid[B]): B =
+    foldMap(fa)(pfn orElse { case _ => F.zero })
+
   /**Right-associative, monadic fold of a structure. */
   def foldRightM[G[_], A, B](fa: F[A], z: => B)(f: (A, => B) => G[B])(implicit M: Monad[G]): G[B] =
     foldLeft[A, B => G[B]](fa, M.point(_))((b, a) => w => M.bind(f(a, w))(b))(z)
@@ -45,7 +49,7 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative, monadic fold of a structure. */
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
-  
+
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 

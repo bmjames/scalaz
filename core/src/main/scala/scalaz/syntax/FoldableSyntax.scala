@@ -6,6 +6,7 @@ trait FoldableOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Foldable[F]
   ////
   final def foldMap[B: Monoid](f: A => B = (a: A) => a): B = F.foldMap(self)(f)
+  final def foldCollect[B : Monoid](pfn: PartialFunction[A, B]) = F.foldCollect(self)(pfn)
   final def foldRight[B](z: => B)(f: (A, => B) => B): B = F.foldRight(self, z)(f)
   final def foldLeft[B](z: B)(f: (B, A) => B): B = F.foldLeft(self, z)(f)
   final def foldRightM[G[_], B](z: => B)(f: (A, => B) => G[B])(implicit M: Monad[G]): G[B] = F.foldRightM(self, z)(f)
