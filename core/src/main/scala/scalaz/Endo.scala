@@ -76,6 +76,11 @@ trait EndoFunctions {
   /** Alias for `Monoid[Endo[A]].zero`. */
   final def idEndo[A]: Endo[A] = endo[A](a => a)
 
+  import Kleisli._
+  /** Endomorphic Kleisli arrow */
+  final def endoKleisli[F[+_] : Monad, A](f: A => F[A]): Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A] =
+    Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A](Kleisli(f))
+
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 
   implicit def IsoEndo[A] = new IsoSet[Endo[A], A => A] {
