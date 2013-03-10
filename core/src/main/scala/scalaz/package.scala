@@ -240,4 +240,7 @@ package object scalaz {
 
   type PIndexedState[-S1, +S2, +A] = PIndexedStateT[Id, S1, S2, A]
   type PState[S, +A] = PStateT[Id, S, A]
+
+  /** Function1 endomorphism, i.e. A => A */
+  type Endo[A] = Endomorphic[Function1, A]
 }

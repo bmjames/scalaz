@@ -109,6 +109,7 @@ class TraverseTest extends Spec {
     "double reverse" ! prop {
       (is: List[Int]) =>
         import syntax.monoid._
+        import Endo._
         Endo(Traverse[List].reverse[Int]).multiply(2).apply(is) must be_===(is)
     }
   }
