@@ -5,6 +5,7 @@ import syntax.semigroup._
 import syntax.reducer._
 import std.option.optionSyntax._
 import syntax.Ops
+import Endo._
 
 /**View of the left end of a sequence.*/
 sealed abstract class ViewL[S[_], A] {

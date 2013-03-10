@@ -1,6 +1,7 @@
 package scalaz
 
 import Id._
+import Endo._
 
 sealed trait BijectionT[F[+_], G[+_], A, B] { self =>
   def to(a: A): F[B]

@@ -2,6 +2,7 @@ package scalaz
 
 ////
 import scalaz.Id.Id
+import scalaz.Endo._
 
 /**
  * A type giving rise to two unrelated [[scalaz.Traverse]]s.

@@ -1,6 +1,7 @@
 package scalaz
 
-import scalaz.Tags.{Conjunction}
+import Scalaz._
+import scalaz.Tags.Conjunction
 
 
 /**
@@ -109,6 +110,7 @@ trait ReducerInstances {
   }
 
   import std.anyVal._
+  import Endo._
 
   /** The "and" monoid. */
   implicit def AllReducer: Reducer[Boolean, Boolean @@ Conjunction] = unitReducer(b => Tag[Boolean, Conjunction](b))

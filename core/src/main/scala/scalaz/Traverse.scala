@@ -2,6 +2,7 @@ package scalaz
 
 ////
 import scalaz.Id.Id
+import scalaz.Endo._
 
 /**
  * Idiomatic traversal of a structure, as described in

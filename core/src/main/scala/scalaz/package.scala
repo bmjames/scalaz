@@ -275,4 +275,8 @@ package object scalaz {
   object Cont extends IndexedContsTFunctions with IndexedContsTInstances {
     def apply[R, A](f: (A => R) => R): Cont[R, A] = IndexedContsT[Id, Id, R, R, A](f)
   }
+
+  /** Function1 endomorphism, i.e. A => A */
+  type Endo[A] = Endomorphic[Function1, A]
+
 }

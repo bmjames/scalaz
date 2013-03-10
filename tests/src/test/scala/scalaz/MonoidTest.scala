@@ -5,6 +5,7 @@ import std.AllInstances._
 class MonoidTest extends Spec {
   "endo multiply" in {
     import syntax.monoid._
+    import Endo._
 
     def inc(i: Int) = i + 1
 

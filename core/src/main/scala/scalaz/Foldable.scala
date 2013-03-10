@@ -278,6 +278,7 @@ object Foldable {
    * }}}
    */
   trait FromFoldMap[F[_]] extends Foldable[F] {
+    import Endo._
     override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
       foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
   }
