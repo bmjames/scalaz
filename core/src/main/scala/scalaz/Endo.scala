@@ -10,7 +10,7 @@ sealed trait Endomorphic[=>:[_, _], A] {
 
   def run: A =>: A
 
-  final def compose(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] = Endomorphic(Arrow[=>:].compose(run, that.run))
+  final def compose(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] = Endomorphic(F.compose(run, that.run))
 
   final def andThen(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] = that.compose(this)
 
@@ -39,20 +39,32 @@ object Endo extends EndoFunctions with EndoInstances {
   }
 }
 
-object Endomorphic {
+object Endomorphic extends EndomorphicFunctions with EndomorphicInstances {
+
   def apply[=>:[_, _], A](arr: A =>: A)(implicit F: Arrow[=>:]) = new Endomorphic[=>:, A] {
     implicit val F: Arrow[=>:] = F
     val run = arr
   }
 }
 
-trait EndoInstances {
+trait EndomorphicFunctions {
 
-  implicit def endoInstance[=>:[_, _] : Arrow, A]: Monoid[Endomorphic[=>:, A]] = new Monoid[Endomorphic[=>:, A]] {
-    private val mon = Arrow[=>:].monoid[A]
-    def append(f1: Endomorphic[=>:, A], f2: => Endomorphic[=>:, A]) = Endomorphic(mon.append(f1.run, f2.run))
-    def zero: Endomorphic[=>:, A] = Endomorphic(mon.zero)
-  }
+  /** Endomorphic Kleisli arrow */
+  final def endoKleisli[F[+_] : Monad, A](f: A => F[A]): Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A] =
+    Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A](Kleisli(f))
+}
+
+trait EndomorphicInstances {
+
+  implicit def endomorphicInstance[=>:[_, _], A](implicit F: Arrow[=>:]): Monoid[Endomorphic[=>:, A]] =
+    new Monoid[Endomorphic[=>:, A]] {
+      val mon = F.monoid[A]
+      def append(f1: Endomorphic[=>:, A], f2: => Endomorphic[=>:, A]) = Endomorphic(mon.append(f1.run, f2.run))
+      def zero: Endomorphic[=>:, A] = Endomorphic(mon.zero)
+    }
+}
+
+trait EndoInstances {
 
   implicit def endoInstances: Zip[Endo] with Unzip[Endo] = new Zip[Endo] with Unzip[Endo] {
     def zip[A, B](a: => Endo[A], b: => Endo[B]) =
@@ -75,11 +87,6 @@ trait EndoFunctions {
 
   /** Alias for `Monoid[Endo[A]].zero`. */
   final def idEndo[A]: Endo[A] = endo[A](a => a)
-
-  import Kleisli._
-  /** Endomorphic Kleisli arrow */
-  final def endoKleisli[F[+_] : Monad, A](f: A => F[A]): Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A] =
-    Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A](Kleisli(f))
 
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 
