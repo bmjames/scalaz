@@ -13,6 +13,22 @@ class MonoidTest extends Spec {
     incTimesThree(0) must be_===(3)
   }
 
+  "endo kleisli multiply" in {
+    import syntax.monoid._
+    import Endomorphic._
+
+    val k = endoKleisli { i: Int => if (i % 2 == 0) Some(i * 2) else None }
+
+    val M = endomorphicInstance[({type λ[α, β] = Kleisli[Option, α, β]})#λ, Int]
+    val kTimes3 = M.multiply(k, 3)
+
+// TODO: why won't the following work?
+//    val kTimes3 = k.multiply(3)
+
+    kTimes3.run(2) must be_=== (Some(16))
+
+  }
+
   "unfold" in {
     val ss = std.stream.unfold(1) {
       case x if x < 10 => Some((x.toString, x * 2))
