@@ -62,6 +62,9 @@ trait EndomorphicInstances {
       def append(f1: Endomorphic[=>:, A], f2: => Endomorphic[=>:, A]) = Endomorphic(mon.append(f1.run, f2.run))
       def zero: Endomorphic[=>:, A] = Endomorphic(mon.zero)
     }
+
+  implicit def kleisliEndoInstance[F[+_] : Monad, A]: Monoid[Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]] =
+    endomorphicInstance[({type λ[α, β] = Kleisli[F, α, β]})#λ, A]
 }
 
 trait EndoInstances {
