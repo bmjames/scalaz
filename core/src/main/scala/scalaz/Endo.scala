@@ -31,18 +31,16 @@ object Endo extends EndoFunctions with EndoInstances {
     final def self = endo
   }
 
+  // Made public, to make it conveniently available from Endo._ when using the Endo monoid. Feels dirty.
   implicit val Function1Arrow: Arrow[Function1] = scalaz.std.function.function1Instance
 
-  def apply[A](f: A => A): Endo[A] = new Endomorphic[Function1, A] {
-    implicit val F = Function1Arrow
-    val run = f
-  }
+  def apply[A](f: A => A): Endo[A] = Endomorphic[Function1, A](Function1Arrow.arr(f))
 }
 
 object Endomorphic extends EndomorphicFunctions with EndomorphicInstances {
 
-  def apply[=>:[_, _], A](arr: A =>: A)(implicit F: Arrow[=>:]) = new Endomorphic[=>:, A] {
-    implicit val F: Arrow[=>:] = F
+  def apply[=>:[_, _], A](arr: A =>: A)(implicit G: Arrow[=>:]) = new Endomorphic[=>:, A] {
+    implicit val F: Arrow[=>:] = G
     val run = arr
   }
 }
