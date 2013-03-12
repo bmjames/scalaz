@@ -6,13 +6,15 @@ import syntax.Ops
   */
 sealed trait Endomorphic[=>:[_, _], A] {
 
-  implicit val F: Arrow[=>:]
+  implicit val F: Category[=>:]
 
   def run: A =>: A
 
-  final def compose(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] = Endomorphic(F.compose(run, that.run))
+  final def compose(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] =
+    Endomorphic[=>:, A](F.compose(run, that.run))
 
-  final def andThen(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] = that.compose(this)
+  final def andThen(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] =
+    that.compose(this)
 
 }
 
@@ -39,9 +41,9 @@ object Endo extends EndoFunctions with EndoInstances {
 
 object Endomorphic extends EndomorphicFunctions with EndomorphicInstances {
 
-  def apply[=>:[_, _], A](arr: A =>: A)(implicit G: Arrow[=>:]) = new Endomorphic[=>:, A] {
-    implicit val F: Arrow[=>:] = G
-    val run = arr
+  def apply[=>:[_, _], A](ga: A =>: A)(implicit G: Category[=>:]) = new Endomorphic[=>:, A] {
+    implicit val F = G
+    val run = ga
   }
 }
 
@@ -54,9 +56,9 @@ trait EndomorphicFunctions {
 
 trait EndomorphicInstances {
 
-  implicit def endomorphicInstance[=>:[_, _], A](implicit F: Arrow[=>:]): Monoid[Endomorphic[=>:, A]] =
+  implicit def endomorphicInstance[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
     new Monoid[Endomorphic[=>:, A]] {
-      val mon = F.monoid[A]
+      val mon = G.monoid[A]
       def append(f1: Endomorphic[=>:, A], f2: => Endomorphic[=>:, A]) = Endomorphic(mon.append(f1.run, f2.run))
       def zero: Endomorphic[=>:, A] = Endomorphic(mon.zero)
     }
