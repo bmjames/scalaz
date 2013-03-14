@@ -6,14 +6,12 @@ import syntax.Ops
   */
 sealed trait Endomorphic[=>:[_, _], A] {
 
-  implicit val F: Category[=>:]
-
   def run: A =>: A
 
-  final def compose(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] =
+  final def compose(that: Endomorphic[=>:, A])(implicit F: Category[=>:]): Endomorphic[=>:, A] =
     Endomorphic[=>:, A](F.compose(run, that.run))
 
-  final def andThen(that: Endomorphic[=>:, A]): Endomorphic[=>:, A] =
+  final def andThen(that: Endomorphic[=>:, A])(implicit F: Category[=>:]): Endomorphic[=>:, A] =
     that.compose(this)
 
 }
@@ -41,8 +39,7 @@ object Endo extends EndoFunctions with EndoInstances {
 
 object Endomorphic extends EndomorphicFunctions with EndomorphicInstances {
 
-  def apply[=>:[_, _], A](ga: A =>: A)(implicit G: Category[=>:]) = new Endomorphic[=>:, A] {
-    implicit val F = G
+  def apply[=>:[_, _], A](ga: A =>: A) = new Endomorphic[=>:, A] {
     val run = ga
   }
 }
