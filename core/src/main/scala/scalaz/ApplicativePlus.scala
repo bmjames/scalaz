@@ -23,20 +23,14 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
   }
 
   /** `empty` or a non-empty list of results acquired by repeating `a`. */
-  def some[A](a: F[A]): F[List[A]] = {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
-    z.run
-  }
+  def some[A](a: F[A]): F[NonEmptyList[A]] =
+    apply2(a, many(a))((x, xs) => NonEmptyList.nel(x, xs.toList))
 
   /** A list of results acquired by repeating `a`.  Never `empty`;
     * initial failure is an empty list instead.
     */
-  def many[A](a: F[A]): F[List[A]] = {
-    lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))
-    lazy val z: Free.Trampoline[F[List[A]]] = y map (apply2(a, _)(_ :: _))
-    y.run
-  }
+  def many[A](a: F[A]): F[List[A]] =
+    plus(apply2(a, many(a))(_ :: _), point(Nil))
 
   ////
   val applicativePlusSyntax = new scalaz.syntax.ApplicativePlusSyntax[F] { def F = ApplicativePlus.this }
